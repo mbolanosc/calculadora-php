@@ -1,7 +1,4 @@
 angular.module('proyectoUno', [])
-    /**
-     * Definimos un servicio que interactuará con el back-end.
-     */
     .service('CalculadoraService', ['$http',
         function($http) {
             var doSomething = function doSomething(firstvalue, secondvalue, operation) {
@@ -17,72 +14,61 @@ angular.module('proyectoUno', [])
                 doSomething: doSomething
             }
         }])
-    /**
-     * Definimos un controlador que consume el servicio.
-     */
     .controller('ProyectoUnoController',
         ['$scope', 'CalculadoraService',
             function ($scope, CalculadoraService) {
                 $scope.init = function() {
-                    $scope.result = 0;
-
+                     $scope.result = null;
+                     $scope.operation = null;
+                     $scope.firstvalue='';
+                     $scope.secondvalue='';
                 };
-                var actualVal = 1;
-                $scope.operation = "";
-                $scope.firstvalue=0,
-                $scope.secondvalue=0;
-                
+            
                 $scope.numberClicked = function numberClicked(number) {
-                    if (actualVal === 1) {
-                        $scope.firstvalue = number;
-                    } else if (actualVal === 2) {
-                        $scope.secondvalue = number;
-                    }
-                 }
+                   if ($scope.operation){
+                    $scope.secondvalue = '' + $scope.secondvalue + number;
+                     }else {
+                        $scope.firstvalue = '' + $scope.firstvalue + number;
+                     }
+                 };
 
-                 $scope.replaceNumber = function replaceNumber() {
-                    if (actualVal === 1) {
-                        actualVal = 2;
-                    } else if (actualVal === 2) {
-                        actualVal = 1;
-                    }
-                 }
-
-                  $scope.doSomethingPlus = function doSomethingPlus() {
+                $scope.doSomethingPlus = function doSomethingPlus() {
                     $scope.operation = "plus";
-                    $scope.replaceNumber();
                  }
 
                  $scope.doSomethingMinus = function doSomethingMinus() {
                     $scope.operation = "minus";
-                    $scope.replaceNumber();
                  }
                  $scope.doSomethingMulti = function doSomethingMulti() {
                     $scope.operation = 'multi';
-                    $scope.replaceNumber();
                  }
                  $scope.doSomethingDiv = function doSomethingDiv(){
-                    $scope.operation = 'divi';
-                    $scope.replaceNumber();
+                    $scope.operation = 'divi'
                  }
 
                $scope.clear = function() {
                  $scope.result = 0;
-               
-                };
+                 $scope.operation = '';
+                 $scope.firstvalue = '';
+                 $scope.secondvalue = '' ;
+               };
   
              $scope.doResult = function doResult() {
-                    //$scope.operation = 'plus';
-                      CalculadoraService
-                        .doSomething($scope.firstvalue, $scope.secondvalue, $scope.operation)
-                        .then(function(response) {
-                            if (response.data) {
-                                $scope.result = response.data;
-                            }
-                        }, function(response) {
-                            $scope.result = response;
-                        });
-                
-                };
+                if($scope.buttonsCalcu.$valid){
+                    CalculadoraService
+                    .doSomething(
+                        parseFloat($scope.firstvalue),
+                        parseFloat($scope.secondvalue),
+                        $scope.operation
+                    ).then(function (response) {
+                        if( response.data) {
+                            $scope.result = response.data;
+                        }
+                    },function ( response ){
+                        $scope.result = response;
+                    });
+                }
+            };
+                    
                 $scope.init();
             }]);
